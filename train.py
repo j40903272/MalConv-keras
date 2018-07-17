@@ -36,12 +36,12 @@ def train():
     
     # prepare data
     if args.resume:
-        with open(join(args.save_path, 'data.pkl'), 'wb') as f:
+        with open(join(args.save_path, 'data.pkl'), 'rb') as f:
             data = pickle.load(f)
-        with open(join(args.save_path, 'label.pkl'), 'wb') as f:
-            label = pickle.dump(f)
-        with open(join(args.save_path, 'tokenizer.pkl'), 'wb') as f:
-            tok = pickle.dump(f)
+        with open(join(args.save_path, 'label.pkl'), 'rb') as f:
+            label = pickle.load(f)
+        with open(join(args.save_path, 'tokenizer.pkl'), 'rb') as f:
+            tok = pickle.load(f)
     else:
         # tokenize, transform and padding
         data, label, tok = preprocess(args.csv, args.max_len, args.save_path)
@@ -73,6 +73,7 @@ def train():
                         verbose=args.verbose, 
                         callbacks=[ear, mcp],
                         validation_data=[x_test, y_test])
+    
     with open(join(args.save_path, 'history.pkl'), 'wb') as f:
         pickle.dump(history.history, f)
 
