@@ -1,7 +1,10 @@
 import numpy as np
+from os.path import join
 import pandas as pd
 import argparse
 import pickle
+import warnings
+warnings.filterwarnings("ignore")
 
 from malconv import Malconv
 from preprocess import preprocess
@@ -16,11 +19,13 @@ parser.add_argument('--max_len', type=int, default = 200000)
 parser.add_argument('--win_size', type=int, default = 500)
 parser.add_argument('--val_size', type=float, default = 0.1, help="")
 parser.add_argument('--save_path', type=str, default = 'saved')
-parser.add_argument('--save_best', type=bool, default = True)
+parser.add_argument('--save_best', action='store_true')
+parser.add_argument('--resume', action='store_true')
 parser.add_argument('--csv', type=str)
 args = parser.parse_args()
 
 def train():
+    # limit gpu memory
     if args.limit > 0:
         import tensorflow as tf
         from keras.backend.tensorflow_backend import set_session
@@ -28,11 +33,23 @@ def train():
         config.gpu_options.per_process_gpu_memory_fraction = args.limit
         set_session(tf.Session(config=config))
     
-    # data transform and padding
-    data, label, tok = preprocess(args.csv, args.max_len, args.save_path)
     
-    model = Malconv(args.max_len, args.win_size, len(tok.word_counts))
+    # prepare data
+    if args.resume:
+        with open(join(args.save_path, 'data.pkl'), 'wb') as f:
+            data = pickle.load(f)
+        with open(join(args.save_path, 'label.pkl'), 'wb') as f:
+            label = pickle.dump(f)
+        with open(join(args.save_path, 'tokenizer.pkl'), 'wb') as f:
+            tok = pickle.dump(f)
+    else:
+        # tokenize, transform and padding
+        data, label, tok = preprocess(args.csv, args.max_len, args.save_path)
+    
+    
+    model = Malconv(args.max_len, args.win_size, len(tok.word_counts)+1)
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])
+    
     
     # shuffle and split validation
     idx = np.arange(len(data))
@@ -41,9 +58,10 @@ def train():
     x_train, x_test = data[idx[split:]], data[idx[:split]]
     y_train, y_test = label[idx[split:]], label[idx[:split]]
     
+    
     # callbacks
     ear = EarlyStopping(monitor='val_acc', patience=5)
-    mcp = ModelCheckpoint(os.path.join(args.save_path, 'malconv.h5'), 
+    mcp = ModelCheckpoint(join(args.save_path, 'malconv.h5'), 
                           monitor="val_acc", 
                           save_best_only=args.save_best, 
                           save_weights_only=False)
@@ -55,6 +73,8 @@ def train():
                         verbose=args.verbose, 
                         callbacks=[ear, mcp],
                         validation_data=[x_test, y_test])
+    with open(join(args.save_path, 'history.pkl'), 'wb') as f:
+        pickle.dump(history.history, f)
 
     
 if __name__ == '__main__':
