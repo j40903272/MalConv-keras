@@ -8,7 +8,9 @@ warnings.filterwarnings("ignore")
 
 from malconv import Malconv
 from preprocess import preprocess
+import utils
 from keras.callbacks import ModelCheckpoint, EarlyStopping
+from keras.models import load_model
 
 parser = argparse.ArgumentParser(description='Malconv-keras classifier')
 parser.add_argument('--batch_size', type=int, default=64)
@@ -27,12 +29,7 @@ args = parser.parse_args()
 def train():
     # limit gpu memory
     if args.limit > 0:
-        import tensorflow as tf
-        from keras.backend.tensorflow_backend import set_session
-        config = tf.ConfigProto()
-        config.gpu_options.per_process_gpu_memory_fraction = args.limit
-        set_session(tf.Session(config=config))
-    
+        utils.limit_gpu_memory(args.limit)
     
     # prepare data
     if args.resume:
@@ -42,21 +39,16 @@ def train():
             label = pickle.load(f)
         with open(join(args.save_path, 'tokenizer.pkl'), 'rb') as f:
             tok = pickle.load(f)
+        model = load_model(join(args.save_path, 'malconv.h5'))
     else:
         # tokenize, transform and padding
         data, label, tok = preprocess(args.csv, args.max_len, args.save_path)
-    
-    
-    model = Malconv(args.max_len, args.win_size, len(tok.word_counts)+1)
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])
+        model = Malconv(args.max_len, args.win_size, len(tok.word_counts)+1)
+        model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])
     
     
     # shuffle and split validation
-    idx = np.arange(len(data))
-    np.random.shuffle(idx)
-    split = int(len(data)*args.val_size)
-    x_train, x_test = data[idx[split:]], data[idx[:split]]
-    y_train, y_test = label[idx[split:]], label[idx[:split]]
+    x_train, x_test, y_train, y_test = utils.train_test_split(data, label, args.val_size)
     
     
     # callbacks

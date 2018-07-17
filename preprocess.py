@@ -13,7 +13,7 @@ def preprocess(csv_path, max_len, save_path=None):
     '''
     print ('\nprocessing data ... need quite a while ......')
     df = pd.read_csv(csv_path, header=None)
-    df = df.head(200)
+    df = df.head(100)
     corpus = []
     for fn in df[0]:
         with open(fn, 'rb') as f:
