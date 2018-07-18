@@ -1,51 +1,44 @@
 import sys
 import os
-import pandas as pd
+import time
 import pickle
-from keras.preprocessing.text import Tokenizer
+import pandas as pd
 from keras.preprocessing.sequence import pad_sequences
 
-def preprocess(csv_path, max_len, save_path=None):
+
+parser = argparse.ArgumentParser(description='Malconv-keras classifier')
+parser.add_argument('--max_len', type=int, default=200000)
+parser.add_argument('--save_path', type=str, default = 'saved/preprocess_data.pkl')
+parser.add_argument('csv', type=str)
+
+def preprocess(fn_list, max_len):
     '''
-    Return processed data and labels (ndarray)
-    
-    tokenizer.pkl, data.pkl, label.pkl would be saved
+    Return processed data (ndarray)
     '''
-    print ('\nprocessing data ... need quite a while ......')
-    df = pd.read_csv(csv_path, header=None)
-    df = df.head(100)
+    #corpus = [open(fn, 'rb').read() for fn in fn_list]
     corpus = []
-    for fn in df[0]:
-        with open(fn, 'rb') as f:
-            corpus.append(f.read())
-
-    tok = Tokenizer(num_words=None,
-                  filters='', 
-                  lower=True,
-                  split=' ', 
-                  char_level=True,
-                  oov_token="<unk>")
-    
-    print ('tokenizing...')
-    tok.fit_on_texts(corpus)
-    print ('transforming...')
-    data = tok.texts_to_sequences(corpus)
-    print ('padding...')
-    seq = pad_sequences(data, maxlen=max_len, padding='post', truncating='post')
-    
-    with open(os.path.join(save_path, 'data.pkl'), 'wb') as f:
-        pickle.dump(seq, f)
-    with open(os.path.join(save_path, 'label.pkl'), 'wb') as f:
-        pickle.dump(df[1].values, f)
-    with open(os.path.join(save_path, 'tokenizer.pkl'), 'wb') as f:
-        pickle.dump(tok, f)
-    
-    return seq, df[1].values, tok
-
+    for fn in fn_list:
+        if not os.path.isfile(fn):
+            print (fn, 'not exist')
+        else:
+            with open(fn, 'rb') as f:
+                corpus.append(f.read())
+    corpus = [[byte for byte in doc] for doc in corpus]
+    seq = pad_sequences(corpus, maxlen=max_len, padding='post', truncating='post')
+    return seq
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 4:
-        print ('Usage: python preprocess.py <csv_path> <max_len> <save_path>')
-    csv_path, max_len, path = sys.argv[1], sys.argv[2], sys.argv[3]
-    data, label, tok = preprocess(csv_path, max_len, path)
+    args = parser.parse_args()
+        
+    df = pd.read_csv(args.csv, header=None)
+    fn_list = df[0].values
+    
+    print ('Preprocessing ...... this may take a while ...')
+    st = time.time()
+    processed_data = preprocess(fn_list, args.max_len)
+    print ('Finished ...... %d sec' % int(time.time()-st))
+    
+    with open(args.save_path, 'wb') as f:
+        pickle.dump(processed_data, f)
+    print ('Preprocessed data store in', args.save_path)
