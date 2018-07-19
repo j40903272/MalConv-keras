@@ -14,7 +14,7 @@ parser.add_argument('csv', type=str)
 
 def preprocess(fn_list, max_len):
     '''
-    Return processed data (ndarray)
+    Return processed data (ndarray) and original file length (list)
     '''
     #corpus = [open(fn, 'rb').read() for fn in fn_list]
     corpus = []
@@ -24,9 +24,11 @@ def preprocess(fn_list, max_len):
         else:
             with open(fn, 'rb') as f:
                 corpus.append(f.read())
+    
     corpus = [[byte for byte in doc] for doc in corpus]
+    len_list = [len(doc) for doc in corpus]
     seq = pad_sequences(corpus, maxlen=max_len, padding='post', truncating='post')
-    return seq
+    return seq, len_list
 
 
 if __name__ == '__main__':
@@ -37,7 +39,7 @@ if __name__ == '__main__':
     
     print ('Preprocessing ...... this may take a while ...')
     st = time.time()
-    processed_data = preprocess(fn_list, args.max_len)
+    processed_data = preprocess(fn_list, args.max_len)[0]
     print ('Finished ...... %d sec' % int(time.time()-st))
     
     with open(args.save_path, 'wb') as f:

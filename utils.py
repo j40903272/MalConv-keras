@@ -24,6 +24,6 @@ def data_generator(data, labels, max_len = 200000, batch_size=64, shuffle=True):
     batches = [idx[range(batch_size*i, min(len(data), batch_size*(i+1)))] for i in range(len(data)//batch_size+1)]
     while True:
         for i in batches:
-            xx = preprocess(data[i], max_len)
+            xx = preprocess(data[i], max_len)[0]
             yy = labels[i]
             yield (xx, yy)
