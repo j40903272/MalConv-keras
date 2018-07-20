@@ -41,7 +41,7 @@ class logger():
         self.pred = []
         self.org = []
     def write(self, fn, org_score, file_len, pad_len, loss, pred):
-        self.fn.append(fn)
+        self.fn.append(fn.split('/')[-1])
         self.org.append(org_score)
         self.len.append(file_len)
         self.pad_len.append(pad_len)

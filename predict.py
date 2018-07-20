@@ -40,5 +40,6 @@ if __name__ == '__main__':
     
     pred = predict(model, fn_list, label, args.batch_size, args.verbose)
     df['predict score'] = pred
+    df[0] = [i.split('/')[-1] for i in fn_list]
     df.to_csv(args.result_path, header=None, index=False)
     print ('Results writen in', args.result_path)
