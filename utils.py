@@ -67,5 +67,5 @@ class logger():
              'loss':self.loss, 
              'predict score':self.pred}
         df = pd.DataFrame(data=d)
-        df.to_csv(path)
-        print ('\nLog saved\n')
+        df.to_csv(path, index=False, columns=['filename','original score', 'file length','pad length','loss','predict score'])
+        print ('\nLog saved to "%s"\n' % path)
