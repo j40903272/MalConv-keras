@@ -1,7 +1,7 @@
 from keras.models import Model
 from keras.layers import Dense, Embedding, Conv1D, multiply, GlobalMaxPool1D, Input, Reshape, Activation
 
-def Malconv(max_len=200000, win_size=500, vocab_size=257):
+def Malconv(max_len=200000, win_size=500, vocab_size=256):
     
     inp = Input((max_len,))
     emb = Embedding(vocab_size, 8)(inp)
