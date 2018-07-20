@@ -1,19 +1,22 @@
 # MalConv-keras
-A Keras implementation of MalConv
+A Keras implementation of MalConv and adversarial sample
 
 ---
 ## Desciprtion
 
-This is the implementation of MalConv proposed in [Malware Detection by Eating a Whole EXE](https://arxiv.org/abs/1710.09435).
+This is the implementation of MalConv proposed in [Malware Detection by Eating a Whole EXE](https://arxiv.org/abs/1710.09435) which can be used for any very long sequence classification.
 
-This model architecture can be used for any very long sequence classification.
+The adversarial samples are crafted by padding some bytes to the input file. It would fail if the origin file length exceeds the model's input size.
+
+Enjoy !
 
 ## Requirement
-- python3
-- numpy
-- pandas
-- pickle
-- keras (tensorflow)
+- python3 (3.5.2)
+- numpy (1.13.1)
+- pandas (0.22.0)
+- pickle (0.7.4)
+- keras (2.1.5)
+- tensorflow (1.6.0)
 
 ## Get started
 #### Clone the repository
@@ -44,6 +47,16 @@ If you require the preprocessed data, run the following
 python3 preprocess.py example.csv
 python3 preprocess.py example.csv --save_path saved/preprocess_data.pkl
 ```
+#### Adversarial
+Try different --step_size, it's quite sensitive
+```
+python3 gen_adversarial.py example.csv
+python3 gen_adversarial.py example.csv --save_path saved/adversarial_samples --pad_percent 0.1
+```
+The process log format would be **<filename**, **original score, file length, pad length, loss, predict score>**
+as in [adversarial_log.csv](https://github.com/j40903272/MalConv-keras/blob/master/saved/adversarial_log.csv)
+
+
 #### Parameters
 Find out more options with `-h`
 ```
@@ -65,4 +78,4 @@ python3 predict.py -h
 python3 preprocess.py -h
 ```
 #### Logs and checkpoint
-The default path for output files would be in [saved/](https://github.com/j40903272/MalConv-keras/tree/master/saved)
+The default path for output files would all be in [saved/](https://github.com/j40903272/MalConv-keras/tree/master/saved)
