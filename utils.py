@@ -52,9 +52,9 @@ class logger():
         if pad_len > 0:
             print ('\tfile length:', file_len)
             print ('\tpad length:', pad_len)
-            if not np.isnan(loss):
-                print ('\tloss:', loss)
-                print ('\tscore:', pred)
+            #if not np.isnan(loss):
+            print ('\tloss:', loss)
+            print ('\tscore:', pred)
         else:
             print ('\tfile length:', file_len, ', Exceed max length ! Ignored !')
         print ('\toriginal score:', org_score)
