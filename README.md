@@ -52,6 +52,9 @@ Try different --step_size, it's quite sensitive
 ```
 python3 gen_adversarial.py example.csv
 python3 gen_adversarial.py example.csv --save_path saved/adversarial_samples --pad_percent 0.1
+
+### for multiple class classification
+python3 gen_adversarial2.py example.csv --class 1
 ```
 The process log format would be **<filename**, **original score, file length, pad length, loss, predict score>**
 as in [adversarial_log.csv](https://github.com/j40903272/MalConv-keras/blob/master/saved/adversarial_log.csv)
