@@ -82,7 +82,7 @@ def gen_adv_samples(model, fn_list, pad_percent=0.1, step_size=0.001, thres=0.5,
         
         if pad_len > 0:
             
-            if np.argmax(org_pred) == 0:
+            if np.argmax(org_pred) != target_class:
                 adv_emb, gradient, loss = fgsm(model, inp_emb, pad_idx, pad_len, e, step_size, target_class)
                 adv = emb_search(inp, adv_emb[0], pad_idx, pad_len)
                 pred = model.predict(adv)[0].astype(float)
