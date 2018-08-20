@@ -75,7 +75,7 @@ def gen_adv_samples(model, fn_list, pad_percent=0.1, step_size=0.001, thres=0.5)
         inp_emb = np.squeeze(np.array(inp2emb([inp, False])), 0)
 
         pad_idx = len_list[0]
-        pad_len = min(int(len_list[0]*pad_percent), max_len-pad_idx)
+        pad_len = max(min(int(len_list[0]*pad_percent), max_len-pad_idx), 0)
         org_score = model.predict(inp)[0][0]    ### origianl score, 0 -> malicious, 1 -> benign
         loss, pred = float('nan'), float('nan')
         

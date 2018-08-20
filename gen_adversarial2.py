@@ -12,7 +12,7 @@ parser.add_argument('--save_path', type=str, default = 'saved/adversarial_sample
 parser.add_argument('--model_path', type=str, default = 'saved/malconv.h5',            help='Path to target model')
 parser.add_argument('--log_path', type=str, default = 'saved/adversarial_log.csv',     help="[csv file] Adv sample generation log")
 parser.add_argument('--pad_percent', type=float, default = 0.1,                        help="padding percentage to origin file")
-parser.add_argument('--class', type=int, default = 1,                                  help="target class. default:1")
+parser.add_argument('--targetClass', type=int, default = 1,                                  help="target class. default:1")
 parser.add_argument('--step_size', type=float, default = 0.001,                        help="optimiztion step size for fgsm, senitive")
 parser.add_argument('--limit', type=float, default = 0.,                               help="limit gpu memory percentage")
 parser.add_argument('csv', type=str,                                                   help="[csv file] Filenames")
@@ -75,8 +75,8 @@ def gen_adv_samples(model, fn_list, pad_percent=0.1, step_size=0.001, target_cla
         inp_emb = np.squeeze(np.array(inp2emb([inp, False])), 0)
 
         pad_idx = len_list[0]
-        pad_len = min(int(len_list[0]*pad_percent), max_len-pad_idx)
-        org_pred = model.predict(inp)[0]    ### origianl score, 0 -> malicious, 1 -> benign
+        pad_len = max(min(int(len_list[0]*pad_percent), max_len-pad_idx), 0)
+        org_pred = np.argmax(model.predict(inp)[0])    ### origianl score, 0 -> malicious, 1 -> benign
         loss, pred = float('nan'), float('nan')
         
         if pad_len > 0:
@@ -84,7 +84,7 @@ def gen_adv_samples(model, fn_list, pad_percent=0.1, step_size=0.001, target_cla
             if np.argmax(org_pred) != target_class:
                 adv_emb, gradient, loss = fgsm(model, inp_emb, pad_idx, pad_len, e, step_size, target_class)
                 adv = emb_search(inp, adv_emb[0], pad_idx, pad_len)
-                pred = model.predict(adv)[0].astype(float)
+                pred = np.argmax(model.predict(adv)[0]).astype(float)
                 final_adv = adv[0][:pad_idx+pad_len]
                 
             else: # use origin file
@@ -113,7 +113,7 @@ if __name__ == '__main__':
     fn_list = df[0].values
     model = load_model(args.model_path)
     
-    adv_samples, log = gen_adv_samples(model, fn_list, args.pad_percent, args.step_size, args.class)
+    adv_samples, log = gen_adv_samples(model, fn_list, args.pad_percent, args.step_size, args.targetClass)
     
     # write to file
     log.save(args.log_path)
