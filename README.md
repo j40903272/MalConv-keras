@@ -59,6 +59,13 @@ python3 gen_adversarial2.py example.csv --class 1
 The process log format would be **<filename**, **original score, file length, pad length, loss, predict score>**
 as in [adversarial_log.csv](https://github.com/j40903272/MalConv-keras/blob/master/saved/adversarial_log.csv)
 
+**< Notice >**
+The generated padding bytes sometimes cannot be corrected encoded, a workaround is as follow :
+```
+# Read bytes then tokenize
+byte_content = open('target', 'rb').read()
+content = [chr(i) for i in byte_content]
+```
 
 #### Parameters
 Find out more options with `-h`
