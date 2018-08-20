@@ -8,6 +8,7 @@ def preprocess(csv_path, max_len, save_path=None):
     Return processed data and labels (ndarray)
     tokenizer.pkl, data.pkl, label.pkl would be saved
     '''
+    print ('\nprocessing data ...... need a while ...')
     data = pd.read_csv(csv_path, header=None)
     corpus = []
     for fn in data[0]:

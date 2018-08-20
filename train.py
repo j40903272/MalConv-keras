@@ -31,7 +31,7 @@ def train():
     # data transform and padding
     data, label, tok = preprocess(args.csv, args.max_len, args.save_path)
     
-    model = Malconv(args.max_len, args.win_size, len(tok.word_counts))
+    model = Malconv(args.max_len, args.win_size, len(tok.word_counts)+1)
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])
     
     # shuffle and split validation
