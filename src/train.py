@@ -6,7 +6,8 @@ import pandas as pd
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 from keras.models import load_model
 
-from . import utils
+import utils
+from preprocess import preprocess
 
 warnings.filterwarnings("ignore")
 
