@@ -1,13 +1,13 @@
 from keras.models import Model
-from keras.layers import Dense, Embedding, Conv1D, multiply, GlobalMaxPool1D, Input, Reshape, Activation
+from keras.layers import Dense, Embedding, Conv1D, multiply, GlobalMaxPool1D, \
+Input, Activation
 
-def Malconv(max_len=200000, win_size=500, vocab_size=256):
-    
+def Malconv(max_len=200000, win_size=500, vocab_size=256):    
     inp = Input((max_len,))
     emb = Embedding(vocab_size, 8)(inp)
-    
-    conv1 = Conv1D(kernel_size = (win_size), filters = 128, strides=(win_size), padding='same')(emb)
-    conv2 = Conv1D(kernel_size = (win_size), filters = 128, strides=(win_size), padding='same')(emb)
+
+    conv1 = Conv1D(kernel_size=(win_size), filters=128, strides=(win_size), padding='same')(emb)
+    conv2 = Conv1D(kernel_size=(win_size), filters=128, strides=(win_size), padding='same')(emb)
     a = Activation('sigmoid')(conv2)
     
     mul = multiply([conv1, a])

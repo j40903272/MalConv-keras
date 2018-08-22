@@ -1,4 +1,3 @@
-import sys
 import os
 import time
 import pickle
@@ -9,7 +8,7 @@ from keras.preprocessing.sequence import pad_sequences
 
 parser = argparse.ArgumentParser(description='Malconv-keras classifier')
 parser.add_argument('--max_len', type=int, default=200000)
-parser.add_argument('--save_path', type=str, default = 'saved/preprocess_data.pkl')
+parser.add_argument('--save_path', type=str, default='saved/preprocess_data.pkl')
 parser.add_argument('csv', type=str)
 
 def preprocess(fn_list, max_len):
@@ -19,7 +18,7 @@ def preprocess(fn_list, max_len):
     corpus = []
     for fn in fn_list:
         if not os.path.isfile(fn):
-            print (fn, 'not exist')
+            print(fn, 'not exist')
         else:
             with open(fn, 'rb') as f:
                 corpus.append(f.read())
@@ -36,11 +35,12 @@ if __name__ == '__main__':
     df = pd.read_csv(args.csv, header=None)
     fn_list = df[0].values
     
-    print ('Preprocessing ...... this may take a while ...')
+    print('Preprocessing ...... this may take a while ...')
     st = time.time()
     processed_data = preprocess(fn_list, args.max_len)[0]
-    print ('Finished ...... %d sec' % int(time.time()-st))
+    print('Finished ...... %d sec' % int(time.time()-st))
     
     with open(args.save_path, 'wb') as f:
         pickle.dump(processed_data, f)
-    print ('Preprocessed data store in', args.save_path)
+    print('Preprocessed data store in', args.save_path)
+

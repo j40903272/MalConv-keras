@@ -1,22 +1,23 @@
 import os
-import utils
 import argparse
 import numpy as np
 import pandas as pd
 from keras.models import load_model
 from keras import backend as K
 from sklearn.neighbors import NearestNeighbors
+
+import utils
 from preprocess import preprocess
 
 parser = argparse.ArgumentParser(description='Malconv-keras classifier training')
-parser.add_argument('--save_path', type=str, default = 'saved/adversarial_samples',    help="Directory for saving adv samples")
-parser.add_argument('--model_path', type=str, default = 'saved/malconv.h5',            help='Path to target model')
-parser.add_argument('--log_path', type=str, default = 'saved/adversarial_log.csv',     help="[csv file] Adv sample generation log")
-parser.add_argument('--pad_percent', type=float, default = 0.1,                        help="padding percentage to origin file")
-parser.add_argument('--targetClass', type=int, default = 1,                            help="target class. default:1")
-parser.add_argument('--step_size', type=float, default = 0.01,                         help="optimiztion step size for fgsm, senitive")
-parser.add_argument('--limit', type=float, default = 0.,                               help="limit gpu memory percentage")
-parser.add_argument('csv', type=str,                                                   help="[csv file] Filenames")
+parser.add_argument('--save_path', type=str, default='saved/adversarial_samples',    help="Directory for saving adv samples")
+parser.add_argument('--model_path', type=str, default='saved/malconv.h5',            help='Path to target model')
+parser.add_argument('--log_path', type=str, default='saved/adversarial_log.csv',     help="[csv file] Adv sample generation log")
+parser.add_argument('--pad_percent', type=float, default=0.1,                        help="padding percentage to origin file")
+parser.add_argument('--targetClass', type=int, default=1,                            help="target class. default:1")
+parser.add_argument('--step_size', type=float, default=0.01,                         help="optimiztion step size for fgsm, senitive")
+parser.add_argument('--limit', type=float, default = 0.,                             help="limit gpu memory percentage")
+parser.add_argument('csv', type=str,                                                 help="[csv file] Filenames")
 
 def fgsm(model, inp, pad_idx, pad_len, e, step_size=0.001, target_class=1):
     adv = inp.copy()
@@ -31,7 +32,7 @@ def fgsm(model, inp, pad_idx, pad_len, e, step_size=0.001, target_class=1):
     iterate = K.function([model.layers[1].output], [loss, grads])
     g = 0.
     step = int(1/step_size)*10
-    for i in range(step):
+    for _ in range(step):
         loss_value, grads_value = iterate([adv])
         grads_value *= step_size
         g += grads_value

@@ -20,7 +20,7 @@ def train_test_split(data, label, val_size=0.1):
     return x_train, x_test, y_train, y_test
 
 
-def data_generator(data, labels, max_len = 200000, batch_size=64, shuffle=True):
+def data_generator(data, labels, max_len=200000, batch_size=64, shuffle=True):
     idx = np.arange(len(data))
     if shuffle:
         np.random.shuffle(idx)
@@ -48,16 +48,16 @@ class logger():
         self.loss.append(loss)
         self.pred.append(pred)
         
-        print ('\nFILE:', fn)
+        print('\nFILE:', fn)
         if pad_len > 0:
-            print ('\tfile length:', file_len)
-            print ('\tpad length:', pad_len)
+            print('\tfile length:', file_len)
+            print('\tpad length:', pad_len)
             #if not np.isnan(loss):
-            print ('\tloss:', loss)
-            print ('\tscore:', pred)
+            print('\tloss:', loss)
+            print('\tscore:', pred)
         else:
-            print ('\tfile length:', file_len, ', Exceed max length ! Ignored !')
-        print ('\toriginal score:', org_score)
+            print('\tfile length:', file_len, ', Exceed max length ! Ignored !')
+        print('\toriginal score:', org_score)
         
     def save(self, path):
         d = {'filename':self.fn, 
@@ -67,5 +67,5 @@ class logger():
              'loss':self.loss, 
              'predict score':self.pred}
         df = pd.DataFrame(data=d)
-        df.to_csv(path, index=False, columns=['filename','original score', 'file length','pad length','loss','predict score'])
-        print ('\nLog saved to "%s"\n' % path)
+        df.to_csv(path, index=False, columns=['filename', 'original score', 'file length', 'pad length', 'loss', 'predict score'])
+        print('\nLog saved to "%s"\n' % path)
