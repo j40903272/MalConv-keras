@@ -6,8 +6,7 @@ from keras.models import load_model
 from keras import backend as K
 from sklearn.neighbors import NearestNeighbors
 
-import utils
-from preprocess import preprocess
+from . import utils
 
 parser = argparse.ArgumentParser(description='Malconv-keras classifier training')
 parser.add_argument('--save_path', type=str, default='../saved/adversarial_samples',    help="Directory for saving adv samples")

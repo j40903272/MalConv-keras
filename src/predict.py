@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from keras.models import load_model
 
-import utils
+from . import utils
 
 parser = argparse.ArgumentParser(description='Malconv-keras classifier')
 parser.add_argument('--batch_size', type=int, default=64)
