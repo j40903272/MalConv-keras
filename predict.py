@@ -1,26 +1,26 @@
-import utils
+import argparse
 import numpy as np
 import pandas as pd
-import argparse
-
 from keras.models import load_model
+
+import utils
 
 parser = argparse.ArgumentParser(description='Malconv-keras classifier')
 parser.add_argument('--batch_size', type=int, default=64)
-parser.add_argument('--verbose', type=int, default = 1)
-parser.add_argument('--limit', type=float, default = 0.)
-parser.add_argument('--model_path', type=str, default = 'saved/malconv.h5')
-parser.add_argument('--result_path', type=str, default = 'saved/result.csv')
+parser.add_argument('--verbose', type=int, default=1)
+parser.add_argument('--limit', type=float, default=0.)
+parser.add_argument('--model_path', type=str, default='saved/malconv.h5')
+parser.add_argument('--result_path', type=str, default='saved/result.csv')
 parser.add_argument('csv', type=str)
 
 def predict(model, fn_list, label, batch_size=64, verbose=1):
     
     max_len = model.input.shape[1]
     pred = model.predict_generator(
-                    utils.data_generator(fn_list, label, max_len, batch_size, shuffle=False),
-                    steps=len(fn_list)//batch_size + 1,
-                    verbose=verbose
-                    )
+        utils.data_generator(fn_list, label, max_len, batch_size, shuffle=False),
+        steps=len(fn_list)//batch_size + 1,
+        verbose=verbose
+        )
     return pred
 
 if __name__ == '__main__':
@@ -42,4 +42,5 @@ if __name__ == '__main__':
     df['predict score'] = pred
     df[0] = [i.split('/')[-1] for i in fn_list]
     df.to_csv(args.result_path, header=None, index=False)
-    print ('Results writen in', args.result_path)
+    print('Results writen in', args.result_path)
+
