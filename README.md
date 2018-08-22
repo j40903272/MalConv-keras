@@ -90,3 +90,21 @@ python3 preprocess.py -h
 ```
 #### Logs and checkpoint
 The default path for output files would all be in [saved/](https://github.com/j40903272/MalConv-keras/tree/master/saved)
+
+## Example
+```
+from malconv import Malconv
+from preprocess import preprocess
+import utils
+
+model = Malconv()
+model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])
+
+df = pd.read_csv(input.csv, header=None)
+filenames, label = df[0].values, df[1].values
+data = preprocess(filenames)
+x_train, x_test, y_train, y_test = utils.train_test_split(data, label)
+
+history = model.fit(x_train, y_train)
+pred = model.predict(x_test)
+```
