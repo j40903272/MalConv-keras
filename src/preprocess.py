@@ -8,7 +8,7 @@ from keras.preprocessing.sequence import pad_sequences
 
 parser = argparse.ArgumentParser(description='Malconv-keras classifier')
 parser.add_argument('--max_len', type=int, default=200000)
-parser.add_argument('--save_path', type=str, default='saved/preprocess_data.pkl')
+parser.add_argument('--save_path', type=str, default='../saved/preprocess_data.pkl')
 parser.add_argument('csv', type=str)
 
 def preprocess(fn_list, max_len):

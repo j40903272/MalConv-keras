@@ -19,10 +19,10 @@ parser.add_argument('--limit', type=float, default=0., help="limit gpy memory pe
 parser.add_argument('--max_len', type=int, default=200000, help="model input legnth")
 parser.add_argument('--win_size', type=int, default=500)
 parser.add_argument('--val_size', type=float, default=0.1, help="validation percentage")
-parser.add_argument('--save_path', type=str, default='saved/', help='Directory to save model and log')
+parser.add_argument('--save_path', type=str, default='../saved/', help='Directory to save model and log')
+parser.add_argument('--model_path', type=str, default='../saved/malconv.h5', help="model to resume")
 parser.add_argument('--save_best', action='store_true', help="Save model with best validation accuracy")
 parser.add_argument('--resume', action='store_true')
-parser.add_argument('--model_path', type=str, default='saved/malconv.h5', help="model to resume")
 parser.add_argument('csv', type=str)
 
 

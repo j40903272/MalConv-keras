@@ -9,9 +9,9 @@ import utils
 from preprocess import preprocess
 
 parser = argparse.ArgumentParser(description='Malconv-keras classifier training')
-parser.add_argument('--save_path', type=str, default='saved/adversarial_samples',    help="Directory for saving adv samples")
-parser.add_argument('--model_path', type=str, default='saved/malconv.h5',            help='Path to target model')
-parser.add_argument('--log_path', type=str, default='saved/adversarial_log.csv',     help="[csv file] Adv sample generation log")
+parser.add_argument('--save_path', type=str, default='../saved/adversarial_samples',    help="Directory for saving adv samples")
+parser.add_argument('--model_path', type=str, default='../saved/malconv.h5',            help='Path to target model')
+parser.add_argument('--log_path', type=str, default='../saved/adversarial_log.csv',     help="[csv file] Adv sample generation log")
 parser.add_argument('--pad_percent', type=float, default=0.1,                        help="padding percentage to origin file")
 parser.add_argument('--thres', type=float, default=0.5,                              help="generate adv if origin score below threshold")
 parser.add_argument('--step_size', type=float, default=0.01,                         help="optimiztion step size for fgsm, senitive")
