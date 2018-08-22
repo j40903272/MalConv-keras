@@ -17,6 +17,7 @@ Enjoy !
 - pickle (0.7.4)
 - keras (2.1.5)
 - tensorflow (1.6.0)
+- sklearn
 
 ## Get started
 #### Clone the repository

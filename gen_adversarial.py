@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from keras.models import load_model
 from keras import backend as K
+from sklearn.neighbors import NearestNeighbors
 from preprocess import preprocess
 
 parser = argparse.ArgumentParser(description='Malconv-keras classifier training')
@@ -13,7 +14,7 @@ parser.add_argument('--model_path', type=str, default = 'saved/malconv.h5',     
 parser.add_argument('--log_path', type=str, default = 'saved/adversarial_log.csv',     help="[csv file] Adv sample generation log")
 parser.add_argument('--pad_percent', type=float, default = 0.1,                        help="padding percentage to origin file")
 parser.add_argument('--thres', type=float, default = 0.5,                              help="generate adv if origin score below threshold")
-parser.add_argument('--step_size', type=float, default = 0.001,                        help="optimiztion step size for fgsm, senitive")
+parser.add_argument('--step_size', type=float, default = 0.01,                         help="optimiztion step size for fgsm, senitive")
 parser.add_argument('--limit', type=float, default = 0.,                               help="limit gpu memory percentage")
 parser.add_argument('csv', type=str,                                                   help="[csv file] Filenames")
 
@@ -29,14 +30,14 @@ def fgsm(model, inp, pad_idx, pad_len, e, step_size=0.001):
     
     iterate = K.function([model.layers[1].output], [loss, grads])
     g = 0.
-    step = int(1/step_size)
+    step = int(1/step_size)*10
     for i in range(step):
         loss_value, grads_value = iterate([adv])
         grads_value *= step_size
         g += grads_value
         adv += grads_value
         #print (e, loss_value, end='\r')
-        if loss_value >= 1.:
+        if loss_value >= 0.9:
             break
     
     return adv, g, loss_value
@@ -45,17 +46,11 @@ def fgsm(model, inp, pad_idx, pad_len, e, step_size=0.001):
 def gen_adv_samples(model, fn_list, pad_percent=0.1, step_size=0.001, thres=0.5):
     
     ###   search for nearest neighbor in embedding space ###
-    def emb_search(org, adv, pad_idx, pad_len):
+    def emb_search(org, adv, pad_idx, pad_len, neigh):
         out = org.copy()
         for idx in range(pad_idx, pad_idx+pad_len):
-            target = adv[idx]
-            min_dist = 9999999
-            best_idx = 0
-            for e, w in enumerate(emb_weight):
-                dist = np.linalg.norm(w - target)
-                if dist < min_dist:
-                    min_dist = dist
-                    best_idx = e
+            target = adv[idx].reshape(1, -1)
+            best_idx = neigh.kneighbors(target, 1, False)[0][0]
             out[0][idx] = best_idx
         return out
     
@@ -63,7 +58,11 @@ def gen_adv_samples(model, fn_list, pad_percent=0.1, step_size=0.001, thres=0.5)
     max_len = int(model.input.shape[1])
     emb_layer = model.layers[1]
     emb_weight = emb_layer.get_weights()[0]
-    inp2emb = K.function([model.input]+ [K.learning_phase()], [emb_layer.output]) # sequence to embedding function
+    inp2emb = K.function([model.input]+ [K.learning_phase()], [emb_layer.output]) # [function] Map sequence to embedding 
+    
+    # Build neighbor searches
+    neigh = NearestNeighbors(1)
+    neigh.fit(emb_weight)
     
     log = utils.logger()
     adv_samples = []
@@ -83,7 +82,7 @@ def gen_adv_samples(model, fn_list, pad_percent=0.1, step_size=0.001, thres=0.5)
             
             if org_score < thres:
                 adv_emb, gradient, loss = fgsm(model, inp_emb, pad_idx, pad_len, e, step_size)
-                adv = emb_search(inp, adv_emb[0], pad_idx, pad_len)
+                adv = emb_search(inp, adv_emb[0], pad_idx, pad_len, neigh)
                 pred = model.predict(adv)[0][0]
                 final_adv = adv[0][:pad_idx+pad_len]
                 
