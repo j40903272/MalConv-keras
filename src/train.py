@@ -27,7 +27,7 @@ parser.add_argument('csv', type=str)
 
 
 
-def train(model, max_len=200000, batch_size=64, verbose=True, epochs=100, save_path='saved/', save_best=True):
+def train(model, max_len=200000, batch_size=64, verbose=True, epochs=100, save_path='../saved/', save_best=True):
     
     # callbacks
     ear = EarlyStopping(monitor='val_acc', patience=5)
