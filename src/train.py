@@ -7,6 +7,7 @@ from keras.callbacks import ModelCheckpoint, EarlyStopping
 from keras.models import load_model
 
 import utils
+from malconv import Malconv
 from preprocess import preprocess
 
 warnings.filterwarnings("ignore")
