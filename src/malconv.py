@@ -7,11 +7,9 @@ def Malconv(max_len=200000, win_size=500, vocab_size=256):
 
     conv1 = Conv1D(kernel_size=(win_size), filters=128, strides=(win_size), padding='same')(emb)
     conv2 = Conv1D(kernel_size=(win_size), filters=128, strides=(win_size), padding='same')(emb)
-    a = Activation('sigmoid', name='sigmoid')(conv2)
-    
-    mul = multiply([conv1, a])
-    a = Activation('relu', name='relu')(mul)
-    p = GlobalMaxPool1D()(a)
+    a = Activation('relu',name='relu')(conv1)
+    mul = multiply([conv2, a])
+    p = GlobalMaxPool1D()(mul)
     d = Dense(64)(p)
     out = Dense(1, activation='sigmoid')(d)
 
